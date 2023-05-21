@@ -62,13 +62,16 @@ def izlocanje_znacilk(slika):
     vektor_znacilk.append(np.concatenate((lbp_znacilke, hog_znacilke)))
     return vektor_znacilk
 
-def face_recognition(pot_slike):
+def face_recognition(pot_slike, ime):
     slika = cv2.imread(pot_slike)
     if slika is not None:
         slika2 = cv2.cvtColor(slika, cv2.COLOR_BGR2GRAY)
         slika2 = cv2.resize(slika2, (100, 100), interpolation = cv2.INTER_AREA)
         vektor_znacilk = izlocanje_znacilk(slika2)
-        razvrscanje = joblib.load('benjamin.pkl')
+        if (ime == "0"):
+            razvrscanje = joblib.load('benjamin.pkl')
+        else:
+            razvrscanje = joblib.load('zan.pkl')
         ugibane_znacilke = razvrscanje.predict(vektor_znacilk)
         return ugibane_znacilke
     else:
