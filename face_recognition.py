@@ -68,7 +68,7 @@ def face_recognition(pot_slike):
         slika2 = cv2.cvtColor(slika, cv2.COLOR_BGR2GRAY)
         slika2 = cv2.resize(slika2, (100, 100), interpolation = cv2.INTER_AREA)
         vektor_znacilk = izlocanje_znacilk(slika2)
-        razvrscanje = joblib.load('benjamin2.pkl')
+        razvrscanje = joblib.load('benjamin.pkl')
         ugibane_znacilke = razvrscanje.predict(vektor_znacilk)
         return ugibane_znacilke
     else:
