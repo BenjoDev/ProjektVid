@@ -7,7 +7,7 @@ import cv2
 import joblib
 
 app = Flask(__name__)
-name = '1' # 0 = Benjamin, 1 = Žan
+name = '0' # 0 = Benjamin, 1 = Žan
 
 @app.route('/name', methods = ['POST'])
 def nameRoute():
