@@ -1,13 +1,15 @@
 from flask import Flask, jsonify, request
 import werkzeug
-from faceRecognition import *
+# from faceRecognition import *
+from newFaceRecognition import *
 import glob
 import json
+import os
 import cv2
 import joblib
 
 app = Flask(__name__)
-name = '0' # 0 = Benjamin, 1 = Žan
+name = '0' # 0 = Other, 1 = Benjamin, 2 = Žan
 
 @app.route('/name', methods = ['POST'])
 def nameRoute():
@@ -30,7 +32,7 @@ def upload():
         for i in removing_files:
             os.remove(i)
         return jsonify({
-            "message": str(message[0])
+            "message": str(message)
         })
 
 if __name__ == "__main__":
