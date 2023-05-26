@@ -22,12 +22,15 @@ def nameRoute():
 
 @app.route('/upload', methods = ['POST'])
 def upload():
+    print("test")
     global name
     if(request.method == 'POST'):
         imageFile = request.files['image']
         filename = werkzeug.utils.secure_filename(imageFile.filename)
         imageFile.save("./uploaded_images/" + filename)
         message = face_recognition("./uploaded_images/" + filename, name)
+        # print("sporocilo2 " + str(message[0]))
+        print("sporocilo " + str(message))
         removing_files = glob.glob('./uploaded_images/*.jpg')
         for i in removing_files:
             os.remove(i)
