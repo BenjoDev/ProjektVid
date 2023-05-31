@@ -3,14 +3,6 @@ import cv2
 import joblib
 import numpy as np
 from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-
-# ---------------------------------------Korak 1: Ustvari polje vseh slik in znacilnic---------------------------------------
-
-print('korak1')
 
 def ustvari_polje_slik_in_znacilnic(pot_mape, znacilnica):
     slike = []
@@ -25,36 +17,6 @@ def ustvari_polje_slik_in_znacilnic(pot_mape, znacilnica):
             slike.append(slika2)
             znacilnice.append(znacilnica)
     return slike, znacilnice
-
-slike_mack, znacilnice_mack = ustvari_polje_slik_in_znacilnic('Zan', 0)
-slike_psov, znacilnice_psov = ustvari_polje_slik_in_znacilnic('other', 1)
-
-slike = np.array(slike_mack + slike_psov, dtype=object)
-znacilnice = znacilnice_mack + znacilnice_psov
-
-np.savez('korak1.npz', slike=slike, znacilnice=znacilnice)
-
-# ---------------------------------------Korak 2: Razdeli slike v ucno in testno mnozico---------------------------------------
-
-# print('korak2')
-
-# def razdeli_podatke(slike, znacilnice):
-#     ucne_slike, testne_slike, ucne_znacilke, testne_znacilke = train_test_split(slike, znacilnice, test_size=0, random_state=20, stratify=znacilnice)
-#     return ucne_slike, ucne_znacilke, testne_slike, testne_znacilke
-
-# podatki = np.load('korak1.npz', allow_pickle=True)
-# slike = podatki['slike']
-# znacilnice = podatki['znacilnice']
-
-# ucne_slike, ucne_znacilke, testne_slike, testne_znacilke = razdeli_podatke(slike, znacilnice)
-# ucne_slike = np.array(ucne_slike, dtype=object)
-# testne_slike = np.array(testne_slike, dtype=object)
-
-# np.savez('korak2.npz', ucne_slike=ucne_slike, ucne_znacilke=ucne_znacilke, testne_slike=testne_slike, testne_znacilke=testne_znacilke)
-
-# ---------------------------------------Korak 3: Extract features using LBP and HOG descriptors---------------------------------------
-
-print('korak3')
 
 def lbp(slika):
     visina, sirina = slika.shape[:2]
@@ -116,56 +78,15 @@ def izlocanje_znacilk(slike):
         vektor_znacilk.append(np.concatenate((lbp_znacilke, hog_znacilke)))
     return vektor_znacilk
 
-podatki = np.load('korak1.npz', allow_pickle=True)
-slike = podatki['slike']
-znacilnice = podatki['znacilnice']
+slike_mack, znacilnice_mack = ustvari_polje_slik_in_znacilnic('Zan', 0)
+slike_psov, znacilnice_psov = ustvari_polje_slik_in_znacilnic('other', 1)
 
-# podatki = np.load('korak2.npz', allow_pickle=True)
-# ucne_slike = podatki['ucne_slike']
-# testne_slike = podatki['testne_slike']
+slike = np.array(slike_mack + slike_psov, dtype=object)
+znacilnice = znacilnice_mack + znacilnice_psov
 
 ucni_vektor_znacilk = izlocanje_znacilk(slike)
-# testni_vektor_znacilk = izlocanje_znacilk(testne_slike)
 
-np.savez('korak3.npz', ucni_vektor_znacilk=ucni_vektor_znacilk)
+razvrscanje = SVC()
+razvrscanje.fit(ucni_vektor_znacilk, znacilnice)
 
-# ---------------------------------------Korak 4: Ucenje razvrscevalnega algoritma---------------------------------------
-
-print('korak4')
-
-podatki = np.load('korak3.npz', allow_pickle=True)
-ucni_vektor_znacilk = podatki['ucni_vektor_znacilk']
-podatki = np.load('korak1.npz', allow_pickle=True)
-ucne_znacilke = podatki['znacilnice']
-
-razvrscanje = SVC() # SVM
-# razvrscanje = DecisionTreeClassifier() # DT
-# razvrscanje = KNeighborsClassifier(n_neighbors=5) # kNN
-razvrscanje.fit(ucni_vektor_znacilk, ucne_znacilke)
-
-joblib.dump(razvrscanje, 'korak4.pkl')
-
-# ---------------------------------------Korak 5: Ugibanje znacilk in primerjava---------------------------------------
-
-# print('korak5')
-
-# razvrscanje = joblib.load('korak4.pkl')
-# podatki = np.load('korak3.npz', allow_pickle=True)
-# testni_vektor_znacilk = podatki['testni_vektor_znacilk']
-# podatki = np.load('korak2.npz', allow_pickle=True)
-# testne_znacilke = podatki['testne_znacilke']
-
-# ugibane_znacilke = razvrscanje.predict(testni_vektor_znacilk)
-# print(f'Tocnost razpoznavanja: {accuracy_score(testne_znacilke, ugibane_znacilke) * 100}%')
-
-# np.savetxt('korak5_znacilke.txt', testne_znacilke, fmt='%d')
-# np.savetxt('korak5_ugibanja.txt', ugibane_znacilke, fmt='%d')
-
-# ---
-
-# data = np.load('korak2.npz', allow_pickle=True)
-# test_images = data['testne_slike']
-# for image in test_images:
-#     cv2.imshow('image',image.astype(np.uint8))
-#     cv2.waitKey(0)
-# cv2.destroyAllWindows()
+joblib.dump(razvrscanje, 'treniran_model.pkl')
