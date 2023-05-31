@@ -38,8 +38,8 @@ import numpy as np
 # print("Confidence Score:", confidence_score)
 
 
-def face_recognition(pot_slike, ime):
-    print("test2")
+def face_recognition(pot_slike):
+    name = "other"
     facedetect = cv2.CascadeClassifier('har.xml')
     model = load_model('keras_model.h5')
 
@@ -47,85 +47,15 @@ def face_recognition(pot_slike, ime):
     faces = facedetect.detectMultiScale(imgOrignal,1.3,5)
 
     for x,y,w,h in faces:
-        print("huh")
         crop_img=imgOrignal[y:y+h,x:x+h]
-        print("1")
         img=cv2.resize(crop_img, (224,224))
-        print("2")        
         img=img.reshape(1, 224, 224, 3)
-        print("3")
-        try:
-            print("hmmm")
-            prediction = model.predict(img)
-        except Exception as e:
-            print("kaj")
-            print(e)
-        print("4")
+        prediction=model.predict(img)
         classIndex = np.argmax(prediction,axis=-1)
-        print("5")
-        print("class2 " + str(classIndex[0]))
-        print("class " + str(classIndex))
-        print("wtf")
-        return classIndex # 0 = other, 1 = Benjamin, 2 = Zan
-    print("no")
+        if(classIndex == 1):
+            name = "benjamin"
+        else:
+            name = "zan"
+        print(name)
+        return name # 0 = other, 1 = Benjamin, 2 = Zan
     return 0
-
-# face_recognition("benjo2.jpg", "da")
-
-# from keras.models import load_model  # TensorFlow is required for Keras to work
-# import cv2  # Install opencv-python
-# import numpy as np
-
-# def face_recognition(pot_slike, ime):
-
-# # Disable scientific notation for clarity
-#     np.set_printoptions(suppress=True)
-
-#     # Load the model
-#     model = load_model("keras_model.h5", compile=False)
-
-#     # Load the labels
-#     class_names = open("labels.txt", "r").readlines()
-
-#     # CAMERA can be 0 or 1 based on default camera of your computer
-#     # camera = cv2.VideoCapture(0)
-
-#     # while True:
-#         # Grab the webcamera's image.
-#         # ret, image = camera.read()
-
-#     image = cv2.imread(pot_slike)
-#         # Resize the raw image into (224-height,224-width) pixels
-#     image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_AREA)
-
-#         # Show the image in a window
-#     # cv2.imshow("Webcam Image", image)
-
-#         # Make the image a numpy array and reshape it to the models input shape.
-#     image = np.asarray(image, dtype=np.float32).reshape(1, 224, 224, 3)
-
-#         # Normalize the image array
-#     image = (image / 127.5) - 1
-
-#         # Predicts the model
-#     prediction = model.predict(image)
-#     index = np.argmax(prediction)
-#     class_name = class_names[index]
-#     confidence_score = prediction[0][index]
-
-#     # Print prediction and confidence score
-#     print("Class:", class_name[2:], end="")
-#     print("Confidence Score:", str(np.round(confidence_score * 100))[:-2], "%")
-#     print(index)
-#     return index
-
-# face_recognition("benjo2.jpg", "da")
-# Listen to the keyboard for presses.
-# keyboard_input = cv2.waitKey(0)
-
-# 27 is the ASCII for the esc key on your keyboard.
-# if keyboard_input == 27:
-#     break
-
-# camera.release()
-# cv2.destroyAllWindows()

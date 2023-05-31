@@ -28,7 +28,7 @@ def upload():
         imageFile = request.files['image']
         filename = werkzeug.utils.secure_filename(imageFile.filename)
         imageFile.save("./uploaded_images/" + filename)
-        message = face_recognition("./uploaded_images/" + filename, name)
+        message = face_recognition("./uploaded_images/" + filename)
         # print("sporocilo2 " + str(message[0]))
         print("sporocilo " + str(message))
         removing_files = glob.glob('./uploaded_images/*.jpg')
